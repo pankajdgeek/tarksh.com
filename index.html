@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tarksh (तार्क्ष्य) — Swift. Logical. Relentless.</title>
+  <meta name="description" content="Tarksh builds AI-powered products for traditional industries. Starting with hospitality. Expanding relentlessly.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%230a0a0a'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='22' font-weight='bold' fill='%23c9a84c' text-anchor='middle'%3ET%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #0a0a0a;
+      --primary: #c9a84c;
+      --secondary: #1a1a2e;
+      --text: #e0e0e0;
+      --highlight: #f5f5f5;
+      --font-body: 'Inter', sans-serif;
+      --font-display: 'Playfair Display', Georgia, serif;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-weight: 300;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* ─── Navbar ─── */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.4s, padding 0.4s, backdrop-filter 0.4s;
+    }
+
+    .navbar.scrolled {
+      background: rgba(10, 10, 10, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 0.85rem 2rem;
+      border-bottom: 1px solid rgba(201, 168, 76, 0.08);
+    }
+
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--highlight);
+      letter-spacing: 0.02em;
+    }
+
+    .nav-logo span {
+      color: var(--primary);
+      margin-right: 0.35rem;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 0.85rem;
+      font-weight: 400;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(224, 224, 224, 0.6);
+      transition: color 0.3s;
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: var(--primary);
+      transition: width 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    .nav-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .nav-toggle span {
+      width: 24px;
+      height: 1.5px;
+      background: var(--text);
+      transition: transform 0.3s, opacity 0.3s;
+    }
+
+    .nav-toggle.active span:nth-child(1) {
+      transform: rotate(45deg) translate(4px, 5px);
+    }
+
+    .nav-toggle.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .nav-toggle.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(4px, -5px);
+    }
+
+    /* ─── Hero ─── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6rem 2rem 4rem;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    .hero-bg svg {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: min(900px, 90vw);
+      height: min(900px, 90vw);
+      opacity: 0.04;
+    }
+
+    .hero-glow {
+      position: absolute;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(201, 168, 76, 0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      text-align: center;
+      max-width: 800px;
+    }
+
+    .hero-tagline {
+      font-family: var(--font-display);
+      font-size: clamp(2.8rem, 7vw, 5.5rem);
+      font-weight: 700;
+      color: var(--highlight);
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-tagline em {
+      font-style: italic;
+      color: var(--primary);
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1rem, 2.2vw, 1.25rem);
+      color: rgba(224, 224, 224, 0.55);
+      max-width: 560px;
+      margin: 0 auto 3rem;
+      font-weight: 300;
+      line-height: 1.8;
+    }
+
+    .cta-btn {
+      display: inline-block;
+      padding: 0.9rem 2.4rem;
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: background 0.35s, color 0.35s, transform 0.3s;
+      cursor: pointer;
+      background: transparent;
+    }
+
+    .cta-btn:hover {
+      background: var(--primary);
+      color: var(--bg);
+      transform: translateY(-2px);
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      opacity: 0.3;
+    }
+
+    .scroll-hint span {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, var(--primary), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.3; transform: scaleY(0.5); transform-origin: top; }
+      50% { opacity: 1; transform: scaleY(1); }
+    }
+
+    /* ─── Section Base ─── */
+    section {
+      padding: 7rem 2rem;
+    }
+
+    .section-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 1.5rem;
+    }
+
+    .section-heading {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 600;
+      color: var(--highlight);
+      margin-bottom: 2rem;
+      line-height: 1.2;
+    }
+
+    /* ─── Divider ─── */
+    .divider {
+      max-width: 1000px;
+      margin: 0 auto;
+      height: 1px;
+      background: linear-gradient(to right, transparent, rgba(201, 168, 76, 0.15), transparent);
+    }
+
+    /* ─── Products ─── */
+    #products {
+      background: linear-gradient(180deg, var(--bg) 0%, rgba(26, 26, 46, 0.15) 50%, var(--bg) 100%);
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+
+    .product-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(201, 168, 76, 0.1);
+      padding: 2.5rem;
+      transition: border-color 0.4s, transform 0.3s, background 0.4s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .product-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(to right, transparent, var(--primary), transparent);
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+
+    .product-card:hover {
+      border-color: rgba(201, 168, 76, 0.25);
+      transform: translateY(-4px);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .product-card:hover::before {
+      opacity: 1;
+    }
+
+    .product-card h3 {
+      font-family: var(--font-body);
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--highlight);
+      margin-bottom: 1rem;
+    }
+
+    .product-card p {
+      color: rgba(224, 224, 224, 0.55);
+      font-size: 0.95rem;
+      line-height: 1.75;
+      margin-bottom: 1.5rem;
+    }
+
+    .product-tags {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.75rem;
+    }
+
+    .product-tags span {
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      padding: 0.3rem 0.75rem;
+      border: 1px solid rgba(201, 168, 76, 0.2);
+      color: var(--primary);
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    .product-link {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--primary);
+      letter-spacing: 0.04em;
+      transition: letter-spacing 0.3s;
+    }
+
+    .product-link:hover {
+      letter-spacing: 0.1em;
+    }
+
+    .product-card.placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 280px;
+      border-style: dashed;
+    }
+
+    .product-card.placeholder p {
+      color: rgba(224, 224, 224, 0.2);
+      font-style: italic;
+      font-size: 0.95rem;
+      margin-bottom: 0;
+    }
+
+    /* ─── About ─── */
+    #about .about-text {
+      font-size: 1.15rem;
+      line-height: 1.9;
+      color: rgba(224, 224, 224, 0.65);
+      max-width: 680px;
+    }
+
+    #about .about-text strong {
+      color: var(--highlight);
+      font-weight: 500;
+    }
+
+    /* ─── The Name ─── */
+    #name {
+      text-align: center;
+      padding: 5rem 2rem;
+    }
+
+    .name-content {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .name-sanskrit {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 400;
+      font-style: italic;
+      color: var(--primary);
+      margin-bottom: 2rem;
+      letter-spacing: 0.02em;
+    }
+
+    .name-meaning {
+      font-size: 1.05rem;
+      line-height: 2;
+      color: rgba(224, 224, 224, 0.5);
+    }
+
+    .name-meaning strong {
+      color: var(--highlight);
+      font-weight: 400;
+    }
+
+    .name-summary {
+      margin-top: 2rem;
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      font-style: italic;
+      color: rgba(201, 168, 76, 0.7);
+    }
+
+    /* ─── Footer ─── */
+    footer {
+      border-top: 1px solid rgba(201, 168, 76, 0.08);
+      padding: 3rem 2rem;
+    }
+
+    .footer-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      font-size: 0.85rem;
+      color: rgba(224, 224, 224, 0.4);
+      transition: color 0.3s;
+    }
+
+    .footer-links a:hover {
+      color: var(--primary);
+    }
+
+    .footer-right {
+      text-align: right;
+    }
+
+    .footer-right p {
+      font-size: 0.78rem;
+      color: rgba(224, 224, 224, 0.25);
+      line-height: 1.8;
+    }
+
+    .footer-right .made-in {
+      font-size: 0.75rem;
+      color: rgba(224, 224, 224, 0.35);
+      margin-top: 0.25rem;
+    }
+
+    /* ─── Reveal Animations ─── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 768px) {
+      .nav-toggle {
+        display: flex;
+      }
+
+      .nav-links {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 280px;
+        height: 100vh;
+        background: rgba(10, 10, 10, 0.97);
+        backdrop-filter: blur(30px);
+        -webkit-backdrop-filter: blur(30px);
+        flex-direction: column;
+        padding: 5rem 2.5rem;
+        gap: 2rem;
+        transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        border-left: 1px solid rgba(201, 168, 76, 0.08);
+      }
+
+      .nav-links.open {
+        right: 0;
+      }
+
+      .nav-links a {
+        font-size: 1rem;
+        color: var(--text);
+      }
+
+      .products-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        padding: 5rem 1.5rem 3rem;
+      }
+
+      section {
+        padding: 5rem 1.5rem;
+      }
+
+      .navbar {
+        padding: 1rem 1.5rem;
+      }
+
+      .footer-inner {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .footer-right {
+        text-align: center;
+      }
+
+      .footer-links {
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero-tagline {
+        font-size: 2.4rem;
+      }
+
+      .product-card {
+        padding: 1.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── Navbar ─── -->
+  <nav class="navbar" id="navbar">
+    <a href="#" class="nav-logo"><span>तार्क्ष्य</span> | TARKSH</a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#products" onclick="closeNav()">Products</a></li>
+      <li><a href="#about" onclick="closeNav()">About</a></li>
+      <li><a href="#contact" onclick="closeNav()">Contact</a></li>
+    </ul>
+    <div class="nav-toggle" id="navToggle" onclick="toggleNav()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+
+  <!-- ─── Hero ─── -->
+  <section class="hero" id="hero">
+    <div class="hero-bg">
+      <div class="hero-glow"></div>
+      <!-- Abstract Garuda / eagle motif -->
+      <svg viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Central wingspan form -->
+        <path d="M400 180 C350 220, 180 260, 80 200 C140 300, 200 340, 400 360 C600 340, 660 300, 720 200 C620 260, 450 220, 400 180Z" stroke="rgba(201,168,76,1)" stroke-width="0.8" fill="none"/>
+        <!-- Upper feather arcs -->
+        <path d="M400 200 C360 240, 220 270, 120 230" stroke="rgba(201,168,76,0.6)" stroke-width="0.5" fill="none"/>
+        <path d="M400 200 C440 240, 580 270, 680 230" stroke="rgba(201,168,76,0.6)" stroke-width="0.5" fill="none"/>
+        <!-- Inner wing structure -->
+        <path d="M400 220 C370 260, 260 290, 160 260" stroke="rgba(201,168,76,0.4)" stroke-width="0.5" fill="none"/>
+        <path d="M400 220 C430 260, 540 290, 640 260" stroke="rgba(201,168,76,0.4)" stroke-width="0.5" fill="none"/>
+        <!-- Tail / descent lines -->
+        <path d="M400 360 L380 520 L400 600 L420 520 L400 360Z" stroke="rgba(201,168,76,0.5)" stroke-width="0.5" fill="none"/>
+        <path d="M380 520 L340 580 L400 600 L460 580 L420 520" stroke="rgba(201,168,76,0.3)" stroke-width="0.5" fill="none"/>
+        <!-- Head / crest -->
+        <path d="M400 180 L395 140 L400 100 L405 140 L400 180Z" stroke="rgba(201,168,76,0.7)" stroke-width="0.6" fill="none"/>
+        <circle cx="400" cy="160" r="4" stroke="rgba(201,168,76,0.5)" stroke-width="0.5" fill="none"/>
+        <!-- Outer wingspan extension -->
+        <path d="M80 200 C60 190, 40 210, 50 240" stroke="rgba(201,168,76,0.3)" stroke-width="0.4" fill="none"/>
+        <path d="M720 200 C740 190, 760 210, 750 240" stroke="rgba(201,168,76,0.3)" stroke-width="0.4" fill="none"/>
+      </svg>
+    </div>
+
+    <div class="hero-content">
+      <h1 class="hero-tagline reveal">Swift. Logical. <em>Relentless.</em></h1>
+      <p class="hero-subtitle reveal reveal-delay-1">Building intelligent systems for industries that move fast.</p>
+      <a href="#products" class="cta-btn reveal reveal-delay-2">Explore Our Products</a>
+    </div>
+
+    <div class="scroll-hint">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ─── Products ─── -->
+  <section id="products">
+    <div class="section-inner">
+      <p class="section-label reveal">Products</p>
+      <h2 class="section-heading reveal reveal-delay-1">What we're building</h2>
+      <div class="products-grid">
+        <div class="product-card reveal reveal-delay-2">
+          <h3>tarksh.ai</h3>
+          <p>One AI-powered communication layer for hospitality — unifying every OTA, every guest message, every channel into one intelligent inbox.</p>
+          <div class="product-tags">
+            <span>Hospitality</span>
+            <span>AI</span>
+            <span>India</span>
+          </div>
+          <a href="https://tarksh.ai" class="product-link" target="_blank" rel="noopener">Learn More →</a>
+        </div>
+        <div class="product-card placeholder reveal reveal-delay-3">
+          <p>More coming soon</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ─── About ─── -->
+  <section id="about">
+    <div class="section-inner">
+      <p class="section-label reveal">About</p>
+      <h2 class="section-heading reveal reveal-delay-1">Why Tarksh?</h2>
+      <div class="about-text reveal reveal-delay-2">
+        <p>Traditional industries run on <strong>fragmented tools</strong>, manual workflows, and disconnected systems. We build AI that understands the mess — and fixes it. Starting with hospitality. Expanding relentlessly.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ─── The Name ─── -->
+  <section id="name">
+    <div class="name-content">
+      <p class="section-label reveal">The Name</p>
+      <h2 class="name-sanskrit reveal reveal-delay-1">तार्क्ष्य</h2>
+      <div class="name-meaning reveal reveal-delay-2">
+        <p><strong>तार्क्ष्य (Tārkṣya)</strong> — the swift divine bird of Vedic mythology.</p>
+        <p><strong>तर्क (Tarka)</strong> — logic, reasoning.</p>
+      </div>
+      <p class="name-summary reveal reveal-delay-3">Tarksh is where speed meets intelligence.</p>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ─── Footer ─── -->
+  <footer id="contact">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="https://tarksh.ai" target="_blank" rel="noopener">tarksh.ai</a>
+        <a href="mailto:hello@tarksh.com">hello@tarksh.com</a>
+      </div>
+      <div class="footer-right">
+        <p>&copy; 2025 Tarksh (तार्क्ष्य)</p>
+        <p class="made-in">Made in India 🇮🇳</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ─── Navbar scroll effect ───
+    const navbar = document.getElementById('navbar');
+    let lastScroll = 0;
+
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 50);
+    }, { passive: true });
+
+    // ─── Mobile nav ───
+    function toggleNav() {
+      document.getElementById('navLinks').classList.toggle('open');
+      document.getElementById('navToggle').classList.toggle('active');
+    }
+
+    function closeNav() {
+      document.getElementById('navLinks').classList.remove('open');
+      document.getElementById('navToggle').classList.remove('active');
+    }
+
+    // ─── Scroll reveal ───
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.15,
+      rootMargin: '0px 0px -40px 0px'
+    });
+
+    reveals.forEach(el => observer.observe(el));
+
+    // ─── Subtle parallax on hero SVG ───
+    const heroSvg = document.querySelector('.hero-bg svg');
+    if (heroSvg && window.matchMedia('(min-width: 768px)').matches) {
+      window.addEventListener('scroll', () => {
+        const y = window.scrollY;
+        if (y < window.innerHeight) {
+          heroSvg.style.transform = `translate(-50%, calc(-50% + ${y * 0.08}px)) rotate(${y * 0.01}deg)`;
+        }
+      }, { passive: true });
+    }
+
+    // ─── Hide scroll hint on scroll ───
+    const scrollHint = document.querySelector('.scroll-hint');
+    if (scrollHint) {
+      window.addEventListener('scroll', () => {
+        scrollHint.style.opacity = Math.max(0, 1 - window.scrollY / 200);
+      }, { passive: true });
+    }
+  </script>
+</body>
+</html>
